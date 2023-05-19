@@ -1,4 +1,4 @@
-from acoustics.praat_acoustics import process_directory
+from acoustics.praat_acoustics import process_directory, acoustics_map
 import os
 
 video_directory = "./data/actor_videos"
@@ -10,7 +10,8 @@ def test_process_directory(tmp_path):
     # check if output files are created
     for f in os.listdir(video_directory):
         if f.endswith(".mp4"):
-            assert os.path.exists(f'{tmp_output_dir}/data/vad/{f[:-4]}.csv')
+            for k in acoustics_map.keys():
+                assert os.path.exists(f'{tmp_output_dir}/data/{k}/{f[:-4]}.csv')
 
 # def test_batch_job():
 #     # This test requires that the s3_path_to_input_csv file contains urls to encrypted videos
