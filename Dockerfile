@@ -44,4 +44,7 @@ RUN pip install -r ./cds-acoustic-traits/requirements.txt
 
 RUN pip install -e ./cds-acoustic-traits
 
+RUN pip uninstall --yes urllib3
+RUN pip install urllib3==1.26.15
+
 ENTRYPOINT ["python", "./cds-acoustic-traits/acoustics/batch_run_praat.py"]
