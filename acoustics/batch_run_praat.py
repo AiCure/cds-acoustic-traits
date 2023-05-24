@@ -20,7 +20,10 @@ class batch_job(ProcessJob):
     def run_task(self):
         try:             
             logger.info('Running CDS acoustics')
-            process_directory(self.local_input_folder, self.local_output_folder, num_threads=1)
+            process_directory(self.local_input_folder, 
+                              self.local_output_folder, 
+                              num_threads=1,
+                              output_format='parquet')
              
         except Exception as e:
             logger.error("Processing CDS Acoustics failed: {}".format(e))  

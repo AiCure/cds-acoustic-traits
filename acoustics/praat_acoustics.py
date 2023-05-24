@@ -143,7 +143,7 @@ def compute_acoustic_traits(video_path, video_id=None, num_left=0, num_videos=1,
     return output
 
 
-def process_videos_from_queue(q, lock, thread_id, output_dir):
+def process_videos_from_queue(q, lock, thread_id, output_dir, output_format='csv'):
     while len(q.video_ids) > 0:
         with lock:
             video_path = q.video_paths.popleft()
@@ -160,16 +160,20 @@ def process_videos_from_queue(q, lock, thread_id, output_dir):
         output = compute_acoustic_traits(video_path, video_id, num_left, num_videos, thread_id)
         for k,df in output.items():
             if df is not None:
-                df.to_csv(f'{output_dir}/{q.dataset_name}/{k}/{video_id}.csv', index=False)
+                if output_format == 'parquet':
+                    df.to_parquet(f'{output_dir}/{q.dataset_name}/{k}/{video_id}.parquet', index=False)
+                else:
+                    df.to_csv(f'{output_dir}/{q.dataset_name}/{k}/{video_id}.csv', index=False)
 
 
-def process_directory(video_dir, output_dir, num_threads=1):
+def process_directory(video_dir, output_dir, num_threads=1, output_format='csv'):
     lock = Lock()
     q = video_queue(video_dir, output_dir)
     
     threads = list()
     for thread_id in range(num_threads):
-        thread = Thread(target=process_videos_from_queue, args=(q, lock, thread_id, output_dir))
+        thread = Thread(target=process_videos_from_queue, 
+                        args=(q, lock, thread_id, output_dir, output_format))
         thread.start()
         threads.append(thread)
     for thread in threads:
